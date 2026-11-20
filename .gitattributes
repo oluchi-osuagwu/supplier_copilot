@@ -1,0 +1,16 @@
+# Line-ending policy for this repo (overrides each developer's local core.autocrlf setting).
+# Store and check out text files with LF endings on every OS, so files behave the same on
+# Windows, in CI (Linux), and in Docker containers (Linux).
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF, which Windows tools expect.
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# Binary files: never touch their bytes.
+*.duckdb binary
+*.parquet binary
+*.png binary
+*.jpg binary
+*.pdf binary

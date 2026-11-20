@@ -1,0 +1,166 @@
+# 20 starter questions from the supplier persona (see docs/problem_statement.md).
+#
+# Each question is tagged so it can grow into the gold evaluation set:
+#   route:      the tool(s) the agent SHOULD use -> scores routing accuracy (week 5-6)
+#               sql | docs | both | refuse
+#   difficulty: easy (one table/filter) | medium (joins, comparisons) | hard (multi-step reasoning)
+#   tests:      the capability this question checks
+#   expected:   filled in later. SQL answers are computed by a hand-written reference query
+#               (week 3); docs answers will cite a specific filing + section (week 2/4).
+#
+# Persona: Maya, category analyst at the fictional "Harvest Lane Foods", whose portfolio is
+# the FOODS_3 department. Data covers 2011-01-29 to 2016-05-22.
+
+version: 1
+questions:
+  # ---------------- SQL: answerable from the warehouse alone ----------------
+  - id: q01
+    question: "What was total FOODS_3 revenue in 2015?"
+    route: sql
+    difficulty: easy
+    tests: [aggregation, year_filter]
+    expected: null
+
+  - id: q02
+    question: "Which state had the highest FOODS_3 unit sales in 2014?"
+    route: sql
+    difficulty: easy
+    tests: [group_by, ranking, store_hierarchy]
+    expected: null
+
+  - id: q03
+    question: "How did FOODS_3 units and revenue change from 2014 to 2015, in percent?"
+    route: sql
+    difficulty: medium
+    tests: [year_over_year, multiple_measures]
+    expected: null
+
+  - id: q04
+    question: "What are the top 10 FOODS_3 items by revenue in Q4 2015?"
+    route: sql
+    difficulty: medium
+    tests: [top_n, quarter_filter, revenue_from_view]
+    expected: null
+
+  - id: q05
+    question: "How does FOODS_3 revenue growth from 2013 to 2015 compare with FOODS_1 and FOODS_2?"
+    route: sql
+    difficulty: medium
+    tests: [internal_benchmark, product_hierarchy]
+    expected: null
+
+  - id: q06
+    question: "Do FOODS_3 sales in Texas go up on SNAP days compared with non-SNAP days?"
+    route: sql
+    difficulty: hard
+    tests: [calendar_join, state_specific_flag, average_comparison]
+    notes: "Must use snap_tx for TX stores only. Compare average daily units, not totals (there are fewer SNAP days)."
+    expected: null
+
+  - id: q07
+    question: "How much did FOODS_3 sell in the week of the Super Bowl versus a normal week in 2015?"
+    route: sql
+    difficulty: hard
+    tests: [event_filter, fiscal_week, baseline_definition]
+    notes: "The agent must pick a reasonable baseline (e.g., average of surrounding weeks) and say which one it used."
+    expected: null
+
+  - id: q08
+    question: "Which FOODS_3 items had a price increase of more than 10% between 2014 and 2015 in CA_1?"
+    route: sql
+    difficulty: hard
+    tests: [price_fact, weekly_grain, per_item_comparison]
+    expected: null
+
+  # ---------------- DOCS: answerable from SEC filings alone ----------------
+  - id: q09
+    question: "What did Walmart's fiscal 2016 10-K say about food price inflation or deflation?"
+    route: docs
+    difficulty: easy
+    tests: [company_filter, fiscal_year_filter, citation]
+    expected: null
+
+  - id: q10
+    question: "Which risk factors about consumer spending did Kroger list in its 10-K for fiscal 2015?"
+    route: docs
+    difficulty: easy
+    tests: [section_filter, citation]
+    expected: null
+
+  - id: q11
+    question: "How did General Mills explain changes in its US retail volumes in fiscal 2015 and 2016?"
+    route: docs
+    difficulty: medium
+    tests: [cpg_peer, multi_document]
+    expected: null
+
+  - id: q12
+    question: "Compare how Walmart and Target described grocery competition in their 2015 annual reports."
+    route: docs
+    difficulty: hard
+    tests: [multi_company, comparison, citation_per_claim]
+    expected: null
+
+  # ---------------- BOTH: needs numbers AND narrative ----------------
+  - id: q13
+    question: "FOODS_3 units fell in 2015 while prices rose. Did any retailers or food companies mention price sensitivity or volume declines in that period?"
+    route: both
+    difficulty: hard
+    tests: [sql_then_docs, period_alignment, hypothesis_with_evidence]
+    notes: "Flagship question. Must reconcile calendar 2015 with fiscal years (Walmart FY2016 = Feb 2015 to Jan 2016)."
+    expected: null
+
+  - id: q14
+    question: "What was our Q4 2015 revenue trend, and what did Walmart say about the 2015 holiday season?"
+    route: both
+    difficulty: medium
+    tests: [quarter_filter, earnings_release, combined_answer]
+    expected: null
+
+  - id: q15
+    question: "Wisconsin FOODS_3 revenue grew faster than California's from 2011 to 2015. Is there anything in the filings about regional or Midwest trends?"
+    route: both
+    difficulty: hard
+    tests: [regional_comparison, weak_evidence_handling]
+    notes: "Filings may not discuss regions. The correct answer may be 'the data shows X; the filings do not explain it.'"
+    expected: null
+
+  - id: q16
+    question: "How did FOODS_3's average price per unit change from 2012 to 2015, and how does that compare to the food inflation retailers reported?"
+    route: both
+    difficulty: hard
+    tests: [derived_metric, mix_vs_price_caveat, market_benchmark]
+    notes: "Average price paid mixes price changes and product-mix shifts. A good answer says so."
+    expected: null
+
+  - id: q17
+    question: "Were SNAP benefit changes mentioned in retailer filings, and do our SNAP-day sales show any change over the years?"
+    route: both
+    difficulty: hard
+    tests: [policy_context, time_series, multi_step]
+    expected: null
+
+  - id: q18
+    question: "Our sales drop to almost zero on Christmas Day every year. Is that a data problem, and what do the filings say about holiday store hours?"
+    route: both
+    difficulty: medium
+    tests: [data_quality_reasoning, structural_zero, citation]
+    notes: "Stores are closed on Dec 25 (total units 11-20 that day), so this is a real effect, not missing data."
+    expected: null
+
+  # ---------------- REFUSE: should decline or say evidence is missing ----------------
+  - id: q19
+    question: "How much will FOODS_3 sell in December 2026?"
+    route: refuse
+    difficulty: easy
+    tests: [out_of_scope_forecast, no_hallucination]
+    notes: "Forecasting is out of scope, and the data ends in May 2016."
+    expected: "Declines, explaining that forecasting is out of scope and data ends 2016-05-22."
+
+  - id: q20
+    question: "What were Harvest Lane's FOODS_3 sales at Target stores in 2015?"
+    route: refuse
+    difficulty: medium
+    tests: [false_premise, no_hallucination]
+    notes: "M5 has only one retailer's stores. There is no Target store-level data."
+    expected: "Explains that the dataset has no Target store data and offers what is available."

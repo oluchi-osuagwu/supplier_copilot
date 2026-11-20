@@ -1,0 +1,26 @@
+# Non-secret configuration. Code reads these values instead of hardcoding them,
+# so the same code runs on your laptop, in CI, and in production by swapping this file.
+# Relative paths are resolved from the project root.
+
+project_name: supplier-insights-copilot
+
+paths:
+  raw_m5_dir: data/raw/m5                          # unzipped Kaggle CSVs (bronze / raw layer)
+  interim_dir: data/interim                        # cleaned but not final (silver layer)
+  duckdb_path: data/processed/supplier_copilot.duckdb  # analytics-ready warehouse (gold layer)
+  sec_filings_dir: data/raw/sec_filings
+  transcripts_dir: data/raw/transcripts
+
+m5:
+  sales_file: sales_train_evaluation.csv   # most complete sales file (d_1 .. d_1941)
+  calendar_file: calendar.csv
+  prices_file: sell_prices.csv
+
+duckdb:
+  memory_limit: 6GB   # cap DuckDB's RAM use; it spills to disk beyond this
+  threads: 4          # parallel worker threads for queries
+
+sec:
+  # Retailers (market context) + CPG suppliers (the "supplier persona" side)
+  tickers: [WMT, TGT, KR, COST, PG, PEP, GIS]
+  form_types: ["10-K"]

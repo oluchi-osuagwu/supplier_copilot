@@ -1,0 +1,34 @@
+# --- Data: never committed (M5 is not redistributable under Kaggle's terms) ---
+# Ignore everything under data/, but keep the empty folder skeleton via .gitkeep files
+data/**
+!data/**/
+!data/**/.gitkeep
+
+# --- Databases ---
+*.duckdb
+*.duckdb.wal
+
+# --- Secrets ---
+.env
+
+# --- Python build / cache artifacts ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# --- Virtual environments ---
+.venv/
+venv/
+
+# --- Frontend (week 7) ---
+node_modules/
+.next/
+
+# --- OS / editor noise ---
+.DS_Store
+Thumbs.db
+.idea/
